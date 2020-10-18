@@ -9,6 +9,9 @@ const App = () => {
 
 
   const [recipes, setRecipes] = useState([]);
+  const [search, setSearch] = useState('');
+  const [query, setQuery] = useState('chicken');
+
   const apiKey = process.env.REACT_APP_APIKEY
 
   const options = {
@@ -16,20 +19,20 @@ const App = () => {
     url: 'https://rapidapi.p.rapidapi.com/recipes/searchComplex',
     qs: {
       offset: '0',
-      number: '2',
-      query: 'burger',
-      cuisine: 'american',
-      includeIngredients: 'onions, lettuce, tomato',
-      excludeIngredients: 'coconut, mango',
-      intolerances: 'peanut, shellfish',
+      number: '3',
+      query: query,
+      // cuisine: '',
+      // includeIngredients: '',
+      // excludeIngredients: '',
+      // intolerances: '',
       type: 'main course',
       ranking: '2',
       minCalories: '150',
       maxCalories: '1500',
       minFat: '5',
-      maxFat: '100',
+      // maxFat: '',
       minProtein: '5',
-      maxProtein: '100',
+      // maxProtein: '',
       minCarbs: '5',
       maxCarbs: '100',
       minCholesterol: '0',
@@ -45,15 +48,15 @@ const App = () => {
 
   useEffect(() => {
     getRecipes();
-  }, [])
+  }, [query]);
 
   const getRecipes = () => {
     return request(options, function (error, response, body) {
       if (error) throw new Error(error);
       // setRecipes(response.toJSON.results)
       const res = JSON.parse(body);
+      console.log(res);
       setRecipes(res.results);
-      console.log(res.results[0].title);
   })
 }
   
@@ -64,16 +67,24 @@ const App = () => {
   //   setRecipes(data.results)
   // }
 
+  const updateSearch = e => {
+    setSearch(e.target.value)
+  }
+
+  const getSearch = e => {
+    e.preventDefault();
+    setQuery(search);
+  }
 
   return (
     <div className="App">
       Text and stuff
-      <form className="search-form">
-        <input className="search-bar" type="text"/>
+      <form className="search-form" onSubmit={getSearch}>
+        <input className="search-bar" type="text" value={search} onChange={updateSearch}/>
         <button className="search-button" type="submit">Search</button>
       </form>
       {recipes.map(recipe => (
-        <Recipe title={recipe.title} calories={recipe.calories} image={recipe.image}/>
+        <Recipe key={recipe.title} title={recipe.title} calories={recipe.calories} image={recipe.image}/>
       ))}
 
     </div>
